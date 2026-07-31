@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Manibarathi Avenue Residents Welfare Association</title>
+<meta name="description" content="Transparent maintenance payment dashboard for Manibarathi Avenue Residents Welfare Association">
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<!-- App styles -->
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top app-navbar">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand fw-semibold" href="#" data-view="dashboard">
+      <i class="bi bi-houses-fill me-2"></i><span id="navBrandShort">MBRWA</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="#" data-view="dashboard"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-view="payments"><i class="bi bi-card-checklist me-1"></i>Payment Status</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-view="property"><i class="bi bi-house-gear me-1"></i>My Property</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-view="reports"><i class="bi bi-file-earmark-bar-graph me-1"></i>Monthly Report</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-view="expenses"><i class="bi bi-receipt-cutoff me-1"></i>Expenses</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-view="bank"><i class="bi bi-bank2 me-1"></i>Bank Balance</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-view="admin"><i class="bi bi-shield-lock me-1"></i>Admin</a></li>
+      </ul>
+      <form class="d-flex" id="globalSearchForm" role="search">
+        <input class="form-control form-control-sm me-2" type="search" id="globalSearchInput" placeholder="Search house / owner...">
+        <button class="btn btn-sm btn-light" type="submit"><i class="bi bi-search"></i></button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== HEADER BAND ===================== -->
+<div class="header-band">
+  <div class="container-fluid px-3">
+    <div class="row align-items-center gy-2">
+      <div class="col-12 col-md-6">
+        <h1 class="h5 mb-0" id="appName">Manibarathi Avenue Residents Welfare Association</h1>
+        <small class="text-white-50">Current period: <span id="headerMonthYear">-</span></small>
+      </div>
+      <div class="col-6 col-md-3 text-md-end">
+        <small class="text-white-50 d-block">Bank Balance</small>
+        <strong id="headerBankBalance">-</strong>
+      </div>
+      <div class="col-6 col-md-3 text-md-end">
+        <small class="text-white-50 d-block">Last Updated</small>
+        <strong id="headerLastUpdated">-</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid px-3 py-3">
+
+  <!-- ===================== DASHBOARD VIEW ===================== -->
+  <section id="view-dashboard" class="app-view">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+      <h2 class="h5 mb-0">Home Dashboard</h2>
+      <div class="d-flex gap-2">
+        <select id="dashboardMonth" class="form-select form-select-sm month-select"></select>
+        <select id="dashboardYear" class="form-select form-select-sm year-select"></select>
+      </div>
+    </div>
+
+    <div class="row g-3" id="dashboardCards"></div>
+
+    <h2 class="h5 mt-4 mb-3">Phase Summary</h2>
+    <div class="row g-3" id="phaseSummaryCards"></div>
+
+    <div class="row g-3 mt-1">
+      <div class="col-12 col-lg-4">
+        <div class="chart-card">
+          <h3 class="h6">Collection by Phase</h3>
+          <canvas id="phasePieChart" height="220"></canvas>
+        </div>
+      </div>
+      <div class="col-12 col-lg-4">
+        <div class="chart-card">
+          <h3 class="h6">Monthly Collection Trend</h3>
+          <canvas id="trendBarChart" height="220"></canvas>
+        </div>
+      </div>
+      <div class="col-12 col-lg-4">
+        <div class="chart-card text-center position-relative">
+          <h3 class="h6">Payment Percentage</h3>
+          <canvas id="collectionGauge" height="220"></canvas>
+          <div class="gauge-label" id="gaugeValueLabel">-</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PAYMENT STATUS VIEW ===================== -->
+  <section id="view-payments" class="app-view d-none">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+      <h2 class="h5 mb-0">Payment Status</h2>
+      <button class="btn btn-sm btn-outline-primary" id="psExportCsv"><i class="bi bi-download me-1"></i>Export CSV</button>
+    </div>
+
+    <div class="filter-bar mb-3">
+      <div class="row g-2">
+        <div class="col-6 col-md-2"><select id="psMonth" class="form-select form-select-sm month-select"></select></div>
+        <div class="col-6 col-md-2"><select id="psYear" class="form-select form-select-sm year-select"></select></div>
+        <div class="col-6 col-md-2">
+          <select id="psPhaseFilter" class="form-select form-select-sm">
+            <option value="">All Phases</option>
+            <option>Phase 1</option><option>Phase 2</option><option>Phase 3</option><option>Phase 4</option><option>Phase 5</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select id="psStatusFilter" class="form-select form-select-sm">
+            <option value="">All Status</option>
+            <option value="Paid">Paid</option>
+            <option value="Pending">Pending</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-4">
+          <input type="text" id="psSearch" class="form-control form-control-sm" placeholder="Search by house number or owner name">
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive card-surface">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>House No.</th><th>Owner</th><th>Phase</th><th>Status</th><th>Paid Date</th><th>Amount</th><th>Phone</th>
+          </tr>
+        </thead>
+        <tbody id="paymentStatusBody"></tbody>
+      </table>
+      <div id="paymentStatusEmpty" class="d-none"></div>
+    </div>
+  </section>
+
+  <!-- ===================== MY PROPERTY VIEW (public, phone-verified) ===================== -->
+  <section id="view-property" class="app-view d-none">
+    <h2 class="h5 mb-1">My Property Details</h2>
+    <p class="text-muted small mb-3">One-time form for every resident. Verify with your house number and phone number on file — no login needed. You can come back anytime to update or delete what you submitted.</p>
+
+    <!-- Step 1: verify identity -->
+    <div id="propertyStep1" class="card-surface p-4 mx-auto" style="max-width:420px;">
+      <form id="propertyVerifyForm">
+        <div class="mb-3">
+          <label class="form-label small">House Number</label>
+          <input type="text" class="form-control" id="propHouseNumber" placeholder="e.g. A12" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small">Phone Number</label>
+          <input type="text" class="form-control" id="propPhone" placeholder="Phone number on file" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100" id="propertyVerifyBtn">Find My Record</button>
+      </form>
+      <p class="small text-muted mt-3 mb-0">Your details must match what the association has on file. If it doesn't match, contact your committee to update your phone number first.</p>
+    </div>
+
+    <!-- Step 2: view / submit / edit / delete -->
+    <div id="propertyStep2" class="card-surface p-4 mx-auto d-none" style="max-width:560px;">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <div id="propResidentSummary" class="mb-1"></div>
+          <span id="propertyStatusBadge" class="badge"></span>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="propertySearchAgain"><i class="bi bi-arrow-left me-1"></i>Search again</button>
+      </div>
+      <p class="small text-muted d-none" id="propertyMeta"></p>
+
+      <form id="propertyDetailsForm" class="mt-2">
+        <div class="mb-2">
+          <label class="form-label small">Property Type</label>
+          <select class="form-select" name="propertyType" required></select>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <label class="form-label small">No. of Family Members</label>
+            <input type="number" class="form-control" name="familyMembers" min="0" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label small">No. of Vehicles</label>
+            <input type="number" class="form-control" name="vehicles" min="0" required>
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Email Address (optional)</label>
+          <input type="email" class="form-control" name="email">
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <label class="form-label small">Emergency Contact Name</label>
+            <input type="text" class="form-control" name="emergencyContactName">
+          </div>
+          <div class="col-6">
+            <label class="form-label small">Emergency Contact Phone</label>
+            <input type="text" class="form-control" name="emergencyContactPhone">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small">Additional Notes (optional)</label>
+          <textarea class="form-control" name="notes" rows="2"></textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary flex-fill" id="propertySaveBtn">Submit My Details</button>
+          <button type="button" class="btn btn-outline-danger d-none" id="propertyDeleteBtn"><i class="bi bi-trash me-1"></i>Delete</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== MONTHLY REPORT VIEW ===================== -->
+  <section id="view-reports" class="app-view d-none">
+    <h2 class="h5 mb-3">Monthly Report</h2>
+    <div class="filter-bar mb-3">
+      <div class="row g-2 align-items-end">
+        <div class="col-6 col-md-3"><label class="form-label small">Month</label><select id="reportMonth" class="form-select form-select-sm month-select"></select></div>
+        <div class="col-6 col-md-3"><label class="form-label small">Year</label><select id="reportYear" class="form-select form-select-sm year-select"></select></div>
+        <div class="col-12 col-md-3">
+          <button class="btn btn-primary btn-sm w-100" id="generateReportBtn"><i class="bi bi-bar-chart-line me-1"></i>Generate Report</button>
+        </div>
+        <div class="col-12 col-md-3 d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm flex-fill" id="downloadReportCsv"><i class="bi bi-filetype-csv"></i> CSV</button>
+          <button class="btn btn-outline-secondary btn-sm flex-fill" id="downloadReportPdf"><i class="bi bi-filetype-pdf"></i> PDF</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-surface p-3 d-none" id="reportResult"></div>
+  </section>
+
+  <!-- ===================== EXPENSES VIEW ===================== -->
+  <section id="view-expenses" class="app-view d-none">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+      <h2 class="h5 mb-0">Expenses</h2>
+      <button class="btn btn-sm btn-outline-primary" id="expensesExportCsv"><i class="bi bi-download me-1"></i>Export CSV</button>
+    </div>
+    <div class="row g-3">
+      <div class="col-12 col-lg-8">
+        <div class="table-responsive card-surface">
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="text-end">Amount</th></tr></thead>
+            <tbody id="expensesBody"></tbody>
+            <tfoot>
+              <tr class="table-light fw-semibold">
+                <td colspan="3">Total Expenses</td><td class="text-end" id="expensesTotal">₹0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="col-12 col-lg-4">
+        <div class="chart-card">
+          <h3 class="h6">Expense Breakdown</h3>
+          <canvas id="expenseDonutChart" height="240"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BANK BALANCE VIEW ===================== -->
+  <section id="view-bank" class="app-view d-none">
+    <h2 class="h5 mb-3">Bank Balance</h2>
+    <div class="row g-3 mb-3" id="bankBalanceCards"></div>
+    <div class="chart-card">
+      <h3 class="h6">Monthly Trend</h3>
+      <canvas id="bankTrendChart" height="220"></canvas>
+    </div>
+  </section>
+
+  <!-- ===================== ADMIN VIEW ===================== -->
+  <section id="view-admin" class="app-view d-none">
+    <h2 class="h5 mb-3">Admin</h2>
+
+    <!-- Login gate -->
+    <div id="adminLoginGate" class="card-surface p-4 mx-auto" style="max-width:380px;">
+      <h3 class="h6 mb-3"><i class="bi bi-shield-lock me-1"></i>Admin Sign In</h3>
+      <form id="adminLoginForm">
+        <div class="mb-3">
+          <label class="form-label small">Password</label>
+          <input type="password" class="form-control" id="adminPasswordInput" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary w-100" id="adminLoginBtn">Sign in</button>
+      </form>
+      <p class="small text-muted mt-3 mb-0">Residents don't need this — everyone can view the dashboard and payment status without logging in.</p>
+    </div>
+
+    <!-- Admin panel -->
+    <div id="adminPanel" class="d-none">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted small"><i class="bi bi-person-badge me-1"></i>Signed in as admin</span>
+        <button class="btn btn-sm btn-outline-danger" id="adminLogoutBtn"><i class="bi bi-box-arrow-right me-1"></i>Sign out</button>
+      </div>
+
+      <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-payments">Payments</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-expenses">Expenses</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-residents">Residents</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-bank">Bank Balance</button></li>
+      </ul>
+
+      <div class="tab-content card-surface p-3">
+        <!-- Payments tab -->
+        <div class="tab-pane fade show active" id="tab-payments">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="small text-muted">Showing payments for <strong id="adminPaymentsMonth"></strong></span>
+            <button class="btn btn-sm btn-primary" id="newPaymentBtn" data-bs-toggle="modal" data-bs-target="#paymentModal"><i class="bi bi-plus-lg me-1"></i>Record Payment</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+              <thead><tr><th>House</th><th>Owner</th><th>Amount</th><th>Date Paid</th><th>Mode</th><th>Actions</th></tr></thead>
+              <tbody id="adminPaymentsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Expenses tab -->
+        <div class="tab-pane fade" id="tab-expenses">
+          <div class="d-flex justify-content-end mb-2">
+            <button class="btn btn-sm btn-primary" id="newExpenseBtn" data-bs-toggle="modal" data-bs-target="#expenseModal"><i class="bi bi-plus-lg me-1"></i>Add Expense</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+              <thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="text-end">Amount</th><th>Actions</th></tr></thead>
+              <tbody id="adminExpensesBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Residents tab -->
+        <div class="tab-pane fade" id="tab-residents">
+          <div class="d-flex justify-content-end mb-2">
+            <button class="btn btn-sm btn-primary" id="newResidentBtn" data-bs-toggle="modal" data-bs-target="#residentModal"><i class="bi bi-plus-lg me-1"></i>Add Resident</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+              <thead><tr><th>House</th><th>Owner</th><th>Phone</th><th>Phase</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="adminResidentsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Bank tab -->
+        <div class="tab-pane fade" id="tab-bank">
+          <p class="text-muted small" id="adminBankSummary">Loading...</p>
+          <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#bankModal"><i class="bi bi-plus-lg me-1"></i>Add Bank Balance Entry</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="text-center text-muted small py-4">
+  &copy; <span id="footerYear"></span> <span id="footerAppName">Manibarathi Avenue Residents Welfare Association</span> — Built for transparency.
+</footer>
+
+<!-- ===================== TOASTS ===================== -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index:1080"></div>
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="paymentForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Record / Edit Payment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="paymentId">
+          <div class="mb-2">
+            <label class="form-label small">Resident</label>
+            <select class="form-select" name="residentId" required></select>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small">Month</label>
+              <select class="form-select month-select" name="month" required></select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Year</label>
+              <select class="form-select year-select" name="year" required></select>
+            </div>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small">Amount (₹)</label>
+              <input type="number" class="form-control" name="amount" value="300" min="0" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Date Paid</label>
+              <input type="date" class="form-control" name="datePaid" required>
+            </div>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small">Payment Mode</label>
+              <select class="form-select" name="paymentMode">
+                <option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Cheque</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Reference No.</label>
+              <input type="text" class="form-control" name="referenceNumber">
+            </div>
+          </div>
+          <div class="mb-1">
+            <label class="form-label small">Remarks</label>
+            <input type="text" class="form-control" name="remarks">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Payment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Expense Modal -->
+<div class="modal fade" id="expenseModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="expenseForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Add / Edit Expense</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="expenseId">
+          <div class="mb-2">
+            <label class="form-label small">Date</label>
+            <input type="date" class="form-control" name="date" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Category</label>
+            <select class="form-select" name="category" required>
+              <option>Security Salary</option>
+              <option>Tree Cutting</option>
+              <option>Drainage Cleaning</option>
+              <option>Electricity</option>
+              <option>Gardening</option>
+              <option>Cleaning</option>
+              <option>Repairs</option>
+              <option>Miscellaneous</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Description</label>
+            <input type="text" class="form-control" name="description" required>
+          </div>
+          <div class="mb-1">
+            <label class="form-label small">Amount (₹)</label>
+            <input type="number" class="form-control" name="amount" min="0" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Resident Modal -->
+<div class="modal fade" id="residentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="residentForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Add / Edit Resident</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="residentId">
+          <div class="mb-2">
+            <label class="form-label small">House Number</label>
+            <input type="text" class="form-control" name="houseNumber" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Owner Name</label>
+            <input type="text" class="form-control" name="ownerName" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Phone Number</label>
+            <input type="text" class="form-control" name="phoneNumber" required>
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label small">Phase</label>
+              <select class="form-select" name="phase" required>
+                <option>Phase 1</option><option>Phase 2</option><option>Phase 3</option><option>Phase 4</option><option>Phase 5</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Status</label>
+              <select class="form-select" name="status">
+                <option>Active</option><option>Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Resident</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Admin: Resident Property Modal -->
+<div class="modal fade" id="adminPropertyModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="adminPropertyForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Resident Property Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="residentId">
+          <div id="adminPropertySummary" class="mb-1"></div>
+          <p class="small text-muted" id="adminPropertyMeta"></p>
+
+          <div class="mb-2">
+            <label class="form-label small">Property Type</label>
+            <select class="form-select" name="propertyType" required></select>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small">No. of Family Members</label>
+              <input type="number" class="form-control" name="familyMembers" min="0" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">No. of Vehicles</label>
+              <input type="number" class="form-control" name="vehicles" min="0" required>
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Email Address</label>
+            <input type="email" class="form-control" name="email">
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small">Emergency Contact Name</label>
+              <input type="text" class="form-control" name="emergencyContactName">
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Emergency Contact Phone</label>
+              <input type="text" class="form-control" name="emergencyContactPhone">
+            </div>
+          </div>
+          <div class="mb-1">
+            <label class="form-label small">Additional Notes</label>
+            <textarea class="form-control" name="notes" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-outline-danger d-none" id="adminPropertyDeleteBtn"><i class="bi bi-trash me-1"></i>Delete</button>
+          <div>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Bank Balance Modal -->
+<div class="modal fade" id="bankModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="bankForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Update Bank Balance</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label small">Date</label>
+            <input type="date" class="form-control" name="date" required>
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label small">Opening Balance (₹)</label>
+              <input type="number" class="form-control" name="openingBalance" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Closing Balance (₹)</label>
+              <input type="number" class="form-control" name="closingBalance" required>
+            </div>
+          </div>
+          <div class="row g-2 mt-1">
+            <div class="col-6">
+              <label class="form-label small">Income (₹)</label>
+              <input type="number" class="form-control" name="income" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Expense (₹)</label>
+              <input type="number" class="form-control" name="expense" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/api.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/property.js"></script>
+<script src="js/admin-panel.js"></script>
+<script src="js/app.js"></script>
+<script>document.getElementById("footerYear").textContent = new Date().getFullYear();</script>
+</body>
+</html>
