@@ -76,6 +76,7 @@ function wireAdminUi() {
       bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide();
       form.reset();
       loadAdminPayments();
+      loadAdminBank();
     } catch (err) { showError(err); }
   });
 
@@ -101,6 +102,7 @@ function wireAdminUi() {
       bootstrap.Modal.getInstance(document.getElementById("expenseModal")).hide();
       form.reset();
       loadAdminExpenses();
+      loadAdminBank();
     } catch (err) { showError(err); }
   });
 
@@ -189,13 +191,13 @@ function wireAdminUi() {
     if (e.target.closest(".delete-payment-btn")) {
       const id = e.target.closest(".delete-payment-btn").dataset.id;
       if (!confirm("Delete this payment record?")) return;
-      try { await Api.deletePayment(id); showToast("Payment deleted.", "success"); loadAdminPayments(); }
+      try { await Api.deletePayment(id); showToast("Payment deleted.", "success"); loadAdminPayments(); loadAdminBank(); }
       catch (err) { showError(err); }
     }
     if (e.target.closest(".delete-expense-btn")) {
       const id = e.target.closest(".delete-expense-btn").dataset.id;
       if (!confirm("Delete this expense record?")) return;
-      try { await Api.deleteExpense(id); showToast("Expense deleted.", "success"); loadAdminExpenses(); }
+      try { await Api.deleteExpense(id); showToast("Expense deleted.", "success"); loadAdminExpenses(); loadAdminBank(); }
       catch (err) { showError(err); }
     }
     if (e.target.closest(".edit-payment-btn")) {
