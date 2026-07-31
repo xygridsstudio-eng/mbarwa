@@ -28,6 +28,7 @@
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link" href="#" data-view="dashboard"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
         <li class="nav-item"><a class="nav-link" href="#" data-view="payments"><i class="bi bi-card-checklist me-1"></i>Payment Status</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" data-view="register"><i class="bi bi-person-plus me-1"></i>Register</a></li>
         <li class="nav-item"><a class="nav-link" href="#" data-view="property"><i class="bi bi-house-gear me-1"></i>My Property</a></li>
         <li class="nav-item"><a class="nav-link" href="#" data-view="reports"><i class="bi bi-file-earmark-bar-graph me-1"></i>Monthly Report</a></li>
         <li class="nav-item"><a class="nav-link" href="#" data-view="expenses"><i class="bi bi-receipt-cutoff me-1"></i>Expenses</a></li>
@@ -142,6 +143,45 @@
         <tbody id="paymentStatusBody"></tbody>
       </table>
       <div id="paymentStatusEmpty" class="d-none"></div>
+    </div>
+  </section>
+
+  <!-- ===================== REGISTER VIEW (public, new resident sign-up) ===================== -->
+  <section id="view-register" class="app-view d-none">
+    <h2 class="h5 mb-1">Resident Registration</h2>
+    <p class="text-muted small mb-3">New to Manibarathi Avenue? Register your household here. A committee member will review and activate your entry before it appears in the dues list.</p>
+
+    <div id="registerFormWrap" class="card-surface p-4 mx-auto" style="max-width:460px;">
+      <form id="registerForm">
+        <div class="mb-3">
+          <label class="form-label small">House Number</label>
+          <input type="text" class="form-control" name="houseNumber" placeholder="e.g. A12" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small">Owner Name</label>
+          <input type="text" class="form-control" name="ownerName" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small">Phone Number</label>
+          <input type="text" class="form-control" name="phoneNumber" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small">Phase</label>
+          <select class="form-select" name="phase" required>
+            <option value="">Select...</option>
+            <option>Phase 1</option><option>Phase 2</option><option>Phase 3</option><option>Phase 4</option><option>Phase 5</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary w-100" id="registerSubmitBtn">Submit Registration</button>
+      </form>
+      <p class="small text-muted mt-3 mb-0">Already registered? Use <strong>My Property</strong> to add or update your household details instead.</p>
+    </div>
+
+    <div id="registerSuccess" class="card-surface p-4 mx-auto d-none text-center" style="max-width:460px;">
+      <i class="bi bi-check-circle-fill text-success" style="font-size:2.5rem;"></i>
+      <h3 class="h6 mt-2 mb-1">Registration submitted</h3>
+      <p class="text-muted small mb-3">Thanks! Your household has been added and is <span class="badge badge-pending">Pending review</span>. A committee member will verify and activate it soon.</p>
+      <button type="button" class="btn btn-outline-secondary btn-sm" id="registerAnotherBtn">Register another household</button>
     </div>
   </section>
 
@@ -509,7 +549,7 @@
             <div class="col-6">
               <label class="form-label small">Status</label>
               <select class="form-select" name="status">
-                <option>Active</option><option>Inactive</option>
+                <option>Active</option><option>Pending</option><option>Inactive</option>
               </select>
             </div>
           </div>
@@ -635,6 +675,7 @@
 <script src="js/api.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/property.js"></script>
+<script src="js/register.js"></script>
 <script src="js/admin-panel.js"></script>
 <script src="js/app.js"></script>
 <script>document.getElementById("footerYear").textContent = new Date().getFullYear();</script>
