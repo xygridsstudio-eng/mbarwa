@@ -87,6 +87,9 @@ const Api = (function () {
 
   const updateBankBalance = (entry) => request("updateBankBalance", withAuth(entry));
 
+  // ---------- Public resident self-registration (no login) ----------
+  const registerResident = (payload) => request("registerResident", payload);
+
   // ---------- Public "My Property" self-service (phone-verified, no login) ----------
   const verifyResident = (houseNumber, phone) => request("verifyResident", { houseNumber, phone });
   const saveMyPropertyDetails = (payload) => request("saveMyPropertyDetails", payload);
@@ -102,6 +105,7 @@ const Api = (function () {
     login, addPayment, updatePayment, deletePayment,
     addExpense, updateExpense, deleteExpense,
     addResident, updateResident, updateBankBalance,
+    registerResident,
     verifyResident, saveMyPropertyDetails, deleteMyPropertyDetails,
     getResidentProperty, updateResidentProperty, deleteResidentProperty
   };

@@ -290,7 +290,7 @@ async function loadAdminResidents() {
         <td>${escapeHtml(r.ownerName)}</td>
         <td>${escapeHtml(r.phoneNumber)}</td>
         <td>${escapeHtml(r.phase)}</td>
-        <td><span class="badge ${r.status === 'Active' ? 'text-bg-success' : 'text-bg-secondary'}">${escapeHtml(r.status)}</span></td>
+        <td><span class="badge ${r.status === 'Active' ? 'text-bg-success' : r.status === 'Pending' ? 'text-bg-warning' : 'text-bg-secondary'}">${escapeHtml(r.status)}</span></td>
         <td>
           <button class="btn btn-sm btn-outline-primary edit-resident-btn"
             data-id="${escapeHtml(r.residentId)}" data-house="${escapeHtml(r.houseNumber)}"
