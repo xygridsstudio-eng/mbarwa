@@ -106,7 +106,6 @@ async function renderDashboard() {
     const data = await Api.getDashboard(State.month, State.year);
 
     document.getElementById("headerMonthYear").textContent = State.month + " " + State.year;
-    document.getElementById("headerBankBalance").textContent = formatCurrency(data.bankBalance);
     document.getElementById("headerLastUpdated").textContent = data.lastUpdated || "-";
 
     container.innerHTML = `
