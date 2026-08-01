@@ -17,6 +17,9 @@ const CONFIG = {
   TOTAL_FAMILIES: 75, // 15 families x 5 phases — keep in sync with FAMILIES_PER_PHASE in apps-script/Code.gs
   PHASES: ["Phase 1", "Phase 2", "Phase 3", "Phase 4", "Phase 5"],
 
+  // Shown in the WhatsApp payment reminder message (Admin → Payments → Reminder)
+  SITE_URL: "https://xygridsstudio-eng.github.io/mbarwa/",
+
   PROPERTY_TYPES: ["Owner-Occupied", "Rented Out", "Vacant"],
 
   MONTHS: [

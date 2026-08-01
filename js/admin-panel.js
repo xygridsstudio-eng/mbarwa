@@ -152,6 +152,60 @@ function wireAdminUi() {
     } catch (err) { showError(err); }
   });
 
+  // Payment reminder: default the month/year pickers to whatever the admin is
+  // currently viewing, and reset any previously generated message each time
+  // the modal is opened.
+  document.getElementById("reminderModal")?.addEventListener("show.bs.modal", () => {
+    document.getElementById("reminderMonth").value = State.month;
+    document.getElementById("reminderYear").value = State.year;
+    document.getElementById("reminderResult").classList.add("d-none");
+    document.getElementById("reminderEmpty").textContent = "";
+  });
+
+  document.getElementById("reminderGenerateBtn")?.addEventListener("click", async () => {
+    const month = document.getElementById("reminderMonth").value;
+    const year = document.getElementById("reminderYear").value;
+    const btn = document.getElementById("reminderGenerateBtn");
+    const resultBox = document.getElementById("reminderResult");
+    const emptyMsg = document.getElementById("reminderEmpty");
+    btn.disabled = true;
+    resultBox.classList.add("d-none");
+    emptyMsg.textContent = "";
+    try {
+      const rows = await Api.getPayments(month, year);
+      const pending = rows.filter((r) => r.status === "Pending");
+      if (!pending.length) {
+        emptyMsg.textContent = `Everyone has paid for ${month} ${year} — nothing to remind.`;
+        return;
+      }
+      const totalPending = pending.length * CONFIG.MAINTENANCE_AMOUNT;
+      const houseLines = pending.map((r) => `🏠 ${r.houseNumber} — ${r.owner}`).join("\n");
+      const message = `📢 *${CONFIG.ASSOCIATION_NAME}*\n*Maintenance Reminder — ${month} ${year}*\n\n`
+        + `The following houses have pending maintenance dues (${formatCurrency(CONFIG.MAINTENANCE_AMOUNT)}/month):\n\n`
+        + `${houseLines}\n\n`
+        + `*Total Pending:* ${formatCurrency(totalPending)} (${pending.length} house${pending.length === 1 ? "" : "s"})\n\n`
+        + `Please clear your dues at the earliest. Check your status anytime: ${CONFIG.SITE_URL}\n\n`
+        + `Thank you! 🙏\n— MBRWA Committee`;
+      document.getElementById("reminderText").value = message;
+      document.getElementById("reminderWhatsAppBtn").href = "https://wa.me/?text=" + encodeURIComponent(message);
+      resultBox.classList.remove("d-none");
+    } catch (err) {
+      showError(err);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById("reminderCopyBtn")?.addEventListener("click", async () => {
+    const text = document.getElementById("reminderText").value;
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("Reminder message copied.", "success");
+    } catch (err) {
+      showToast("Could not copy automatically — select the text and copy manually.", "warning");
+    }
+  });
+
   // Admin: edit a resident's property details on their behalf
   document.getElementById("adminPropertyForm").addEventListener("submit", async (e) => {
     e.preventDefault();
