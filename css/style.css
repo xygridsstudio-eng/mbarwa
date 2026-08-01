@@ -17,17 +17,88 @@ body {
   font-family: "Segoe UI", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* ---------- Navbar & header ---------- */
-.app-navbar {
-  background: linear-gradient(90deg, var(--blue-dark), var(--blue));
+/* ---------- App shell: left sidebar + main column ---------- */
+.app-shell {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100vh;
 }
-.app-navbar .nav-link {
+
+.app-sidebar {
+  width: 240px;
+  flex: 0 0 240px;
+  background: linear-gradient(180deg, var(--blue-dark), var(--blue));
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1045;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+}
+.sidebar-brand .navbar-brand { color: #fff; font-size: 1.15rem; margin: 0; }
+.sidebar-search { padding: 0 14px 14px; }
+.sidebar-nav { list-style: none; margin: 0; padding: 4px 0; flex: 1; }
+.sidebar-nav .nav-link {
+  display: flex;
+  align-items: center;
   color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
+  padding: 11px 18px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
 }
-.app-navbar .nav-link.active,
-.app-navbar .nav-link:hover {
+.sidebar-nav .nav-link.active,
+.sidebar-nav .nav-link:hover {
   color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: #fff;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(90deg, var(--blue-dark), var(--blue));
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 1040;
+}
+.sidebar-backdrop.show { display: block; }
+
+@media (max-width: 991.98px) {
+  .app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
+  }
+  .app-sidebar.show { transform: translateX(0); }
 }
 
 .header-band {
@@ -107,6 +178,7 @@ body {
 .phase-title { font-weight: 700; font-size: .9rem; color: #374151; }
 .phase-residents { font-size: .72rem; color: #6b7280; margin-bottom: 2px; }
 .phase-amount { font-size: 1.25rem; font-weight: 800; color: var(--green); }
+.phase-expected { font-size: .72rem; font-weight: 600; color: #6b7280; }
 .phase-pending { font-size: .78rem; color: var(--red); margin-bottom: 6px; }
 .phase-progress { height: 6px; border-radius: 4px; }
 .phase-percent { font-size: .72rem; color: #6b7280; margin-top: 4px; }

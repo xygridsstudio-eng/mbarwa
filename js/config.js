@@ -14,7 +14,7 @@ const CONFIG = {
   // Association constants
   ASSOCIATION_NAME: "Manibarathi Avenue Residents Welfare Association",
   MAINTENANCE_AMOUNT: 300, // ₹ per family per month
-  TOTAL_FAMILIES: 70,
+  TOTAL_FAMILIES: 75, // 15 families x 5 phases — keep in sync with FAMILIES_PER_PHASE in apps-script/Code.gs
   PHASES: ["Phase 1", "Phase 2", "Phase 3", "Phase 4", "Phase 5"],
 
   PROPERTY_TYPES: ["Owner-Occupied", "Rented Out", "Vacant"],

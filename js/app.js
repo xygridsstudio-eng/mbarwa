@@ -32,12 +32,23 @@ function wireNav() {
     el.addEventListener("click", (e) => {
       e.preventDefault();
       navigateTo(el.getAttribute("data-view"));
-      const navbar = document.getElementById("navbarNav");
-      if (navbar && navbar.classList.contains("show")) {
-        bootstrap.Collapse.getOrCreateInstance(navbar).hide();
-      }
+      closeSidebar();
     });
   });
+
+  document.getElementById("sidebarToggleBtn")?.addEventListener("click", openSidebar);
+  document.getElementById("sidebarCloseBtn")?.addEventListener("click", closeSidebar);
+  document.getElementById("sidebarBackdrop")?.addEventListener("click", closeSidebar);
+}
+
+function openSidebar() {
+  document.getElementById("appSidebar")?.classList.add("show");
+  document.getElementById("sidebarBackdrop")?.classList.add("show");
+}
+
+function closeSidebar() {
+  document.getElementById("appSidebar")?.classList.remove("show");
+  document.getElementById("sidebarBackdrop")?.classList.remove("show");
 }
 
 function navigateTo(view) {
@@ -146,8 +157,8 @@ async function renderDashboard() {
       <div class="col-6 col-md-4 col-lg-2-4">
         <div class="phase-card" style="border-top-color:${PALETTE[i % PALETTE.length]}">
           <div class="phase-title">${escapeHtml(p.phase)}</div>
-          <div class="phase-residents">${p.residentCount} resident${p.residentCount === 1 ? '' : 's'}</div>
-          <div class="phase-amount">${formatCurrency(p.collected)}</div>
+          <div class="phase-residents">${p.residentCount} resident${p.residentCount === 1 ? '' : 's'} registered</div>
+          <div class="phase-amount">${formatCurrency(p.collected)} <span class="phase-expected">of ${formatCurrency(p.expected)}</span></div>
           <div class="phase-pending">Pending ${formatCurrency(p.pending)}</div>
           <div class="progress phase-progress">
             <div class="progress-bar" role="progressbar" style="width:${p.percent}%; background:${PALETTE[i % PALETTE.length]}"></div>
@@ -359,6 +370,7 @@ document.addEventListener("submit", (e) => {
     e.preventDefault();
     const q = document.getElementById("globalSearchInput").value;
     navigateTo("payments");
+    closeSidebar();
     setTimeout(() => {
       document.getElementById("psSearch").value = q;
       drawPaymentStatusTable();

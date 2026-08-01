@@ -15,55 +15,65 @@
 </head>
 <body>
 
-<!-- ===================== NAVBAR ===================== -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top app-navbar">
-  <div class="container-fluid px-3">
-    <a class="navbar-brand fw-semibold" href="#" data-view="dashboard">
-      <i class="bi bi-houses-fill me-2"></i><span id="navBrandShort">MBRWA</span>
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="#" data-view="dashboard"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-view="payments"><i class="bi bi-card-checklist me-1"></i>Payment Status</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-view="register"><i class="bi bi-person-plus me-1"></i>Register</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-view="property"><i class="bi bi-house-gear me-1"></i>My Property</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-view="reports"><i class="bi bi-file-earmark-bar-graph me-1"></i>Monthly Report</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-view="expenses"><i class="bi bi-receipt-cutoff me-1"></i>Expenses</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-view="bank"><i class="bi bi-bank2 me-1"></i>Bank Balance</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-view="admin"><i class="bi bi-shield-lock me-1"></i>Admin</a></li>
-      </ul>
-      <form class="d-flex" id="globalSearchForm" role="search">
-        <input class="form-control form-control-sm me-2" type="search" id="globalSearchInput" placeholder="Search house / owner...">
-        <button class="btn btn-sm btn-light" type="submit"><i class="bi bi-search"></i></button>
-      </form>
-    </div>
-  </div>
-</nav>
+<div class="app-shell">
 
-<!-- ===================== HEADER BAND ===================== -->
-<div class="header-band">
-  <div class="container-fluid px-3">
-    <div class="row align-items-center gy-2">
-      <div class="col-12 col-md-6">
-        <h1 class="h5 mb-0" id="appName">Manibarathi Avenue Residents Welfare Association</h1>
-        <small class="text-white-50">Current period: <span id="headerMonthYear">-</span></small>
-      </div>
-      <div class="col-6 col-md-3 text-md-end">
-        <small class="text-white-50 d-block">Bank Balance</small>
-        <strong id="headerBankBalance">-</strong>
-      </div>
-      <div class="col-6 col-md-3 text-md-end">
-        <small class="text-white-50 d-block">Last Updated</small>
-        <strong id="headerLastUpdated">-</strong>
+  <!-- ===================== SIDEBAR (left navigation) ===================== -->
+  <aside class="app-sidebar" id="appSidebar">
+    <div class="sidebar-brand">
+      <a class="navbar-brand fw-semibold mb-0" href="#" data-view="dashboard">
+        <i class="bi bi-houses-fill me-2"></i><span id="navBrandShort">MBRWA</span>
+      </a>
+      <button type="button" class="btn-close btn-close-white d-lg-none" id="sidebarCloseBtn" aria-label="Close"></button>
+    </div>
+    <form class="sidebar-search d-flex" id="globalSearchForm" role="search">
+      <input class="form-control form-control-sm me-2" type="search" id="globalSearchInput" placeholder="Search house / owner...">
+      <button class="btn btn-sm btn-light" type="submit"><i class="bi bi-search"></i></button>
+    </form>
+    <ul class="sidebar-nav">
+      <li><a class="nav-link" href="#" data-view="dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+      <li><a class="nav-link" href="#" data-view="payments"><i class="bi bi-card-checklist me-2"></i>Payment Status</a></li>
+      <li><a class="nav-link" href="#" data-view="register"><i class="bi bi-person-plus me-2"></i>Register</a></li>
+      <li><a class="nav-link" href="#" data-view="property"><i class="bi bi-house-gear me-2"></i>My Property</a></li>
+      <li><a class="nav-link" href="#" data-view="reports"><i class="bi bi-file-earmark-bar-graph me-2"></i>Monthly Report</a></li>
+      <li><a class="nav-link" href="#" data-view="expenses"><i class="bi bi-receipt-cutoff me-2"></i>Expenses</a></li>
+      <li><a class="nav-link" href="#" data-view="bank"><i class="bi bi-bank2 me-2"></i>Bank Balance</a></li>
+      <li><a class="nav-link" href="#" data-view="admin"><i class="bi bi-shield-lock me-2"></i>Admin</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ===================== MAIN COLUMN ===================== -->
+  <div class="app-main">
+
+    <!-- Mobile top bar (sidebar toggle) -->
+    <div class="app-topbar d-lg-none">
+      <button type="button" class="btn btn-sm text-white" id="sidebarToggleBtn" aria-label="Open navigation">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <span class="fw-semibold"><i class="bi bi-houses-fill me-2"></i>MBRWA</span>
+    </div>
+
+    <!-- ===================== HEADER BAND ===================== -->
+    <div class="header-band">
+      <div class="container-fluid px-3">
+        <div class="row align-items-center gy-2">
+          <div class="col-12 col-md-6">
+            <h1 class="h5 mb-0" id="appName">Manibarathi Avenue Residents Welfare Association</h1>
+            <small class="text-white-50">Current period: <span id="headerMonthYear">-</span></small>
+          </div>
+          <div class="col-6 col-md-3 text-md-end">
+            <small class="text-white-50 d-block">Bank Balance</small>
+            <strong id="headerBankBalance">-</strong>
+          </div>
+          <div class="col-6 col-md-3 text-md-end">
+            <small class="text-white-50 d-block">Last Updated</small>
+            <strong id="headerLastUpdated">-</strong>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="container-fluid px-3 py-3">
+    <div class="container-fluid px-3 py-3">
 
   <!-- ===================== DASHBOARD VIEW ===================== -->
   <section id="view-dashboard" class="app-view">
@@ -397,12 +407,15 @@
     </div>
   </section>
 
-</div>
+    </div>
 
-<!-- ===================== FOOTER ===================== -->
-<footer class="text-center text-muted small py-4">
-  &copy; <span id="footerYear"></span> <span id="footerAppName">Manibarathi Avenue Residents Welfare Association</span> — Built for transparency.
-</footer>
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="text-center text-muted small py-4">
+      &copy; <span id="footerYear"></span> <span id="footerAppName">Manibarathi Avenue Residents Welfare Association</span> — Built for transparency.
+    </footer>
+
+  </div><!-- /.app-main -->
+</div><!-- /.app-shell -->
 
 <!-- ===================== TOASTS ===================== -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index:1080"></div>
