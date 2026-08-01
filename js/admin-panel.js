@@ -152,6 +152,24 @@ function wireAdminUi() {
     } catch (err) { showError(err); }
   });
 
+  // Groups pending residents under a "*Phase N*" heading (in canonical Phase 1-5
+  // order, with any unexpected phase values appended at the end) so the reminder
+  // message is easy to scan instead of one long flat list.
+  function groupPendingByPhase(pending) {
+    const grouped = {};
+    pending.forEach((r) => {
+      const phase = r.phase || "Unspecified";
+      (grouped[phase] = grouped[phase] || []).push(r);
+    });
+    const orderedPhases = CONFIG.PHASES
+      .filter((p) => grouped[p])
+      .concat(Object.keys(grouped).filter((p) => CONFIG.PHASES.indexOf(p) === -1));
+    return orderedPhases.map((phase) => {
+      const houses = grouped[phase].map((r) => `🏠 ${r.houseNumber} — ${r.owner}`).join("\n");
+      return `*${phase}* (${grouped[phase].length} pending)\n${houses}`;
+    }).join("\n\n");
+  }
+
   // Payment reminder: default the month/year pickers to whatever the admin is
   // currently viewing, and reset any previously generated message each time
   // the modal is opened.
@@ -179,7 +197,7 @@ function wireAdminUi() {
         return;
       }
       const totalPending = pending.length * CONFIG.MAINTENANCE_AMOUNT;
-      const houseLines = pending.map((r) => `🏠 ${r.houseNumber} — ${r.owner}`).join("\n");
+      const houseLines = groupPendingByPhase(pending);
       const message = `📢 *${CONFIG.ASSOCIATION_NAME}*\n*Maintenance Reminder — ${month} ${year}*\n\n`
         + `The following houses have pending maintenance dues (${formatCurrency(CONFIG.MAINTENANCE_AMOUNT)}/month):\n\n`
         + `${houseLines}\n\n`
