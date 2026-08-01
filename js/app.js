@@ -293,7 +293,18 @@ document.addEventListener("click", async (e) => {
     try {
       const data = await Api.getDashboard(month, year);
       const expenseData = await Api.getExpenses(month, year);
+      const paymentRows = await Api.getPayments(month, year);
       const net = data.collectionThisMonth - expenseData.total;
+
+      // Paid vs not-paid counts per phase, to go alongside the amounts already
+      // in data.phaseSummary (which are computed against the fixed 15/phase target).
+      const phaseBreakdown = data.phaseSummary.map((p) => {
+        const rows = paymentRows.filter((r) => r.phase === p.phase);
+        const paidCount = rows.filter((r) => r.status === "Paid").length;
+        const notPaidCount = rows.length - paidCount;
+        return Object.assign({ paidCount, notPaidCount }, p);
+      });
+
       box.innerHTML = `
         <div class="row g-3" id="reportPrintable">
           <div class="col-12"><h5 class="mb-0">Report for ${escapeHtml(month)} ${escapeHtml(String(year))}</h5></div>
@@ -301,9 +312,36 @@ document.addEventListener("click", async (e) => {
           <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Pending</div><div class="stat-value text-danger">${formatCurrency(data.pendingAmount)}</div></div></div>
           <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Expenses</div><div class="stat-value text-warning">${formatCurrency(expenseData.total)}</div></div></div>
           <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Net Balance</div><div class="stat-value ${net >= 0 ? 'text-success' : 'text-danger'}">${formatCurrency(net)}</div></div></div>
+
+          <div class="col-12">
+            <h6 class="mt-2 mb-2">Phase-wise Breakdown</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Phase</th><th>Registered</th><th>Paid</th><th>Not Paid</th>
+                    <th>Collected</th><th>Pending</th><th>Phase Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${phaseBreakdown.map((p) => `
+                    <tr>
+                      <td>${escapeHtml(p.phase)}</td>
+                      <td>${p.residentCount}</td>
+                      <td><span class="badge badge-paid">${p.paidCount}</span></td>
+                      <td><span class="badge badge-pending">${p.notPaidCount}</span></td>
+                      <td class="text-success">${formatCurrency(p.collected)}</td>
+                      <td class="text-danger">${formatCurrency(p.pending)}</td>
+                      <td>${formatCurrency(p.expected)}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       `;
-      State.lastReport = { month, year, data, expenseData };
+      State.lastReport = { month, year, data, expenseData, phaseBreakdown };
     } catch (err) {
       renderEmpty(box, err.message);
       showError(err);
@@ -312,14 +350,16 @@ document.addEventListener("click", async (e) => {
 
   if (e.target && e.target.id === "downloadReportCsv") {
     if (!State.lastReport) { showToast("Generate a report first.", "warning"); return; }
-    const { month, year, data, expenseData } = State.lastReport;
-    exportToCsv(`report-${month}-${year}.csv`, [{
-      Month: month, Year: year,
-      TotalCollected: data.collectionThisMonth,
-      Pending: data.pendingAmount,
-      Expenses: expenseData.total,
-      NetBalance: data.collectionThisMonth - expenseData.total
-    }]);
+    const { phaseBreakdown } = State.lastReport;
+    exportToCsv(`report-phase-breakdown-${State.lastReport.month}-${State.lastReport.year}.csv`, phaseBreakdown.map((p) => ({
+      Phase: p.phase,
+      Registered: p.residentCount,
+      Paid: p.paidCount,
+      NotPaid: p.notPaidCount,
+      Collected: p.collected,
+      Pending: p.pending,
+      PhaseTotal: p.expected
+    })));
   }
   if (e.target && e.target.id === "downloadReportPdf") {
     if (!State.lastReport) { showToast("Generate a report first.", "warning"); return; }
