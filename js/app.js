@@ -51,12 +51,29 @@ function closeSidebar() {
   document.getElementById("sidebarBackdrop")?.classList.remove("show");
 }
 
+/** If the active view lives inside a collapsible sidebar group (Residents,
+ * Financials, Admin), expand that group and highlight its header — so landing
+ * directly on e.g. "Register" still shows which section you're in. */
+function highlightSidebarGroup(view) {
+  document.querySelectorAll(".sidebar-group-toggle").forEach((t) => t.classList.remove("active"));
+  const activeLink = document.querySelector('.sidebar-nav [data-view="' + view + '"]');
+  const group = activeLink ? activeLink.closest(".sidebar-group") : null;
+  if (!group) return;
+  const toggle = group.querySelector(".sidebar-group-toggle");
+  const submenu = group.querySelector(".sidebar-subnav");
+  toggle.classList.add("active");
+  if (submenu && !submenu.classList.contains("show")) {
+    bootstrap.Collapse.getOrCreateInstance(submenu, { toggle: false }).show();
+  }
+}
+
 function navigateTo(view) {
   document.querySelectorAll(".app-view").forEach((v) => v.classList.add("d-none"));
   document.querySelectorAll("[data-view]").forEach((v) => v.classList.remove("active"));
   const target = document.getElementById("view-" + view);
   if (target) target.classList.remove("d-none");
   document.querySelectorAll('[data-view="' + view + '"]').forEach((v) => v.classList.add("active"));
+  highlightSidebarGroup(view);
 
   if (view === "dashboard") renderDashboard();
   if (view === "payments") renderPaymentStatus();

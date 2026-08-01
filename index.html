@@ -31,13 +31,37 @@
     </form>
     <ul class="sidebar-nav">
       <li><a class="nav-link" href="#" data-view="dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
-      <li><a class="nav-link" href="#" data-view="payments"><i class="bi bi-card-checklist me-2"></i>Payment Status</a></li>
-      <li><a class="nav-link" href="#" data-view="register"><i class="bi bi-person-plus me-2"></i>Register</a></li>
-      <li><a class="nav-link" href="#" data-view="property"><i class="bi bi-house-gear me-2"></i>My Property</a></li>
-      <li><a class="nav-link" href="#" data-view="reports"><i class="bi bi-file-earmark-bar-graph me-2"></i>Monthly Report</a></li>
-      <li><a class="nav-link" href="#" data-view="expenses"><i class="bi bi-receipt-cutoff me-2"></i>Expenses</a></li>
-      <li><a class="nav-link" href="#" data-view="bank"><i class="bi bi-bank2 me-2"></i>Bank Balance</a></li>
-      <li><a class="nav-link" href="#" data-view="admin"><i class="bi bi-shield-lock me-2"></i>Admin</a></li>
+
+      <li class="sidebar-group">
+        <a class="nav-link sidebar-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#navGroupResidents" role="button" aria-expanded="false">
+          <i class="bi bi-people me-2"></i>Residents <i class="bi bi-chevron-down ms-auto sidebar-chevron"></i>
+        </a>
+        <ul class="collapse sidebar-subnav" id="navGroupResidents">
+          <li><a class="nav-link" href="#" data-view="register"><i class="bi bi-person-plus me-2"></i>Register</a></li>
+          <li><a class="nav-link" href="#" data-view="property"><i class="bi bi-house-gear me-2"></i>My Property</a></li>
+        </ul>
+      </li>
+
+      <li class="sidebar-group">
+        <a class="nav-link sidebar-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#navGroupFinancials" role="button" aria-expanded="false">
+          <i class="bi bi-cash-stack me-2"></i>Financials <i class="bi bi-chevron-down ms-auto sidebar-chevron"></i>
+        </a>
+        <ul class="collapse sidebar-subnav" id="navGroupFinancials">
+          <li><a class="nav-link" href="#" data-view="payments"><i class="bi bi-card-checklist me-2"></i>Payment Status</a></li>
+          <li><a class="nav-link" href="#" data-view="expenses"><i class="bi bi-receipt-cutoff me-2"></i>Expenses</a></li>
+        </ul>
+      </li>
+
+      <li class="sidebar-group">
+        <a class="nav-link sidebar-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#navGroupAdmin" role="button" aria-expanded="false">
+          <i class="bi bi-shield-lock me-2"></i>Admin <i class="bi bi-chevron-down ms-auto sidebar-chevron"></i>
+        </a>
+        <ul class="collapse sidebar-subnav" id="navGroupAdmin">
+          <li><a class="nav-link" href="#" data-view="admin"><i class="bi bi-box-arrow-in-right me-2"></i>Login</a></li>
+          <li><a class="nav-link" href="#" data-view="reports"><i class="bi bi-file-earmark-bar-graph me-2"></i>Monthly Report</a></li>
+          <li><a class="nav-link" href="#" data-view="bank"><i class="bi bi-bank2 me-2"></i>Bank Balance</a></li>
+        </ul>
+      </li>
     </ul>
   </aside>
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>

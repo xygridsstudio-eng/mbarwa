@@ -61,6 +61,26 @@ body {
   border-left-color: #fff;
 }
 
+/* ---------- Sidebar groups (collapsible sub-sections) ---------- */
+.sidebar-group-toggle { justify-content: space-between; }
+.sidebar-chevron { font-size: .75rem; transition: transform .2s ease; }
+.sidebar-group-toggle[aria-expanded="true"] .sidebar-chevron { transform: rotate(180deg); }
+.sidebar-group-toggle.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: #fff;
+}
+.sidebar-subnav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.12);
+}
+.sidebar-subnav .nav-link {
+  padding-left: 42px;
+  font-size: .92rem;
+}
+
 .app-main {
   flex: 1;
   min-width: 0;
