@@ -108,11 +108,16 @@ apps-script/SheetSetup.gs
 1. On the live site, click **Admin** in the navigation bar.
 2. Sign in with the password you set in Step 2 (`setAdminPassword`).
 3. From the Admin panel you can:
-   - **Payments tab** — record a new payment, edit, or delete one
-   - **Expenses tab** — add, edit, or delete an expense
+   - **Payments tab** — record a new payment, edit, or delete one. The
+     bank balance is recalculated live from every recorded payment, so it
+     always reflects the current total automatically.
+   - **Expenses tab** — add, edit, or delete an expense. The bank balance
+     is recalculated live here too.
    - **Residents tab** — add a new resident or edit an existing one
-   - **Bank Balance tab** — add a new balance entry after reconciling
-     with the actual bank statement each month
+   - **Bank Balance tab** — add a fresh balance entry when you reconcile
+     with the actual bank statement (e.g. once a month); this becomes the
+     new starting point that future payments/expenses are added to and
+     subtracted from
 4. Share the admin password only with trusted committee members. To
    change it later, re-run `setAdminPassword` in the Apps Script editor
    with a new value.
@@ -125,11 +130,36 @@ apps-script/SheetSetup.gs
    and record each one against the resident and month.
 2. As bills are paid, open **Admin → Expenses** and log each expense
    under its category.
-3. After reconciling with the bank statement, open **Admin → Bank
-   Balance** and add the month's opening balance, income, expenses, and
-   closing balance.
-4. The Home Dashboard, Phase Summary, and charts update automatically —
-   no manual recalculation needed.
+3. The bank balance is never manually maintained day-to-day — it's always
+   computed live as: the opening balance from your last reconciliation,
+   plus every payment recorded since, minus every expense recorded since.
+   No separate update step is needed for step 1 or 2 to be reflected.
+4. Periodically (e.g. once a month), reconcile against the actual bank
+   statement: open **Admin → Bank Balance** and add a fresh entry with the
+   real opening balance for that period (income/expense/closing balance can
+   be left as your record of that reconciliation). This corrects for
+   anything the app doesn't otherwise know about (bank interest, charges,
+   manual corrections) and becomes the new starting point that future
+   payments/expenses are computed from.
+5. The Home Dashboard, Phase Summary, Bank Balance, and charts update
+   automatically — no manual recalculation needed.
+
+## "Register" — new resident self-sign-up form
+
+New residents who aren't yet in the Residents sheet can add themselves via the
+**Register** tab of the live site — no login required.
+
+**How it works:**
+1. A resident enters House Number, Owner Name, Phone Number, and Phase.
+2. The server rejects the submission if that house number already has an
+   Active or Pending entry (pointing them to **My Property** instead, so
+   existing households can't be overwritten by a stranger).
+3. Otherwise a new row is appended to the **Residents** sheet with status
+   **Pending** — it does **not** count toward dues, dashboards, or Payment
+   Status until a committee member reviews it.
+4. In **Admin → Residents**, edit the new entry and change its status to
+   **Active** to bring it into the maintenance cycle (or **Inactive** to
+   reject it).
 
 ## "My Property" — one-time resident self-service form
 
@@ -184,3 +214,7 @@ form themselves.
 - **Changes in Google Sheets don't show up** — the dashboard reads data
   live on every page load/filter change, so a browser refresh is enough;
   no caching layer is used.
+- **"Unknown action" errors after pulling code updates** — editing
+  `apps-script/Code.gs` locally does not update the live backend. Paste the
+  updated file into the Apps Script editor, then **Deploy → Manage
+  deployments → pencil icon → New version** (see Step 2).

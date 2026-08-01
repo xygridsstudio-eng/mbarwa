@@ -1,0 +1,7 @@
+# Apps Script backend code lives in the Google Apps Script editor, not GitHub —
+# see DEPLOYMENT_GUIDE.md. Keeping it out of the repo avoids confusion about
+# which copy is "live" (GitHub Pages only serves the frontend files below).
+apps-script/
+
+# Local Claude Code tooling (dev server config, permissions) — not part of the app.
+.claude/
