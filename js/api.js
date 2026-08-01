@@ -84,6 +84,7 @@ const Api = (function () {
 
   const addResident = (resident) => request("addResident", withAuth(resident));
   const updateResident = (resident) => request("updateResident", withAuth(resident));
+  const deleteResident = (residentId) => request("deleteResident", withAuth({ residentId }));
 
   const updateBankBalance = (entry) => request("updateBankBalance", withAuth(entry));
 
@@ -104,7 +105,7 @@ const Api = (function () {
     getResidents, getPayments, getExpenses, getDashboard, getBankBalance,
     login, addPayment, updatePayment, deletePayment,
     addExpense, updateExpense, deleteExpense,
-    addResident, updateResident, updateBankBalance,
+    addResident, updateResident, deleteResident, updateBankBalance,
     registerResident,
     verifyResident, saveMyPropertyDetails, deleteMyPropertyDetails,
     getResidentProperty, updateResidentProperty, deleteResidentProperty

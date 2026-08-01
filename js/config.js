@@ -9,7 +9,7 @@
 const CONFIG = {
   // Paste your deployed Apps Script Web App URL here.
   // Example: "https://script.google.com/macros/s/AKfycb.../exec"
-  API_URL: "https://script.google.com/macros/s/AKfycbwiomiyVtkOgxc3D5MCNSJxFPfO1Yn1YagVmBJNjaAaImF72GYe7jYyYGwCm2Nlrgh8/exec",
+  API_URL: "https://script.google.com/macros/s/AKfycbxDHywpsj5X-cPW7M6LBF9WT4ghwg8GUaOPzE8c4YrME2swxiYEY2WPtuK4L1En28dP/exec",
 
   // Association constants
   ASSOCIATION_NAME: "Manibarathi Avenue Residents Welfare Association",

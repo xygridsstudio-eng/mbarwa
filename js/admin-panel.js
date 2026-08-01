@@ -272,6 +272,14 @@ function wireAdminUi() {
       try { await Api.deleteExpense(id); showToast("Expense deleted.", "success"); loadAdminExpenses(); loadAdminBank(); }
       catch (err) { showError(err); }
     }
+    if (e.target.closest(".delete-resident-btn")) {
+      const btn = e.target.closest(".delete-resident-btn");
+      const id = btn.dataset.id;
+      const house = btn.dataset.house;
+      if (!confirm(`Permanently delete resident at house ${house}? This cannot be undone. Their past payment records are kept but will no longer be linked to an active resident.\n\nIf you just want to stop counting their dues, edit them and set Status to Inactive instead.`)) return;
+      try { await Api.deleteResident(id); showToast("Resident deleted.", "success"); loadAdminResidents(); }
+      catch (err) { showError(err); }
+    }
     if (e.target.closest(".edit-payment-btn")) {
       const btn = e.target.closest(".edit-payment-btn");
       const form = document.getElementById("paymentForm");
@@ -374,6 +382,9 @@ async function loadAdminResidents() {
           </button>
           <button class="btn btn-sm btn-outline-secondary view-property-btn" data-id="${escapeHtml(r.residentId)}" title="View/edit property details">
             <i class="bi bi-house-gear"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-danger delete-resident-btn" data-id="${escapeHtml(r.residentId)}" data-house="${escapeHtml(r.houseNumber)}" title="Delete resident">
+            <i class="bi bi-trash"></i>
           </button>
         </td>
       </tr>
