@@ -146,6 +146,7 @@ async function renderDashboard() {
       <div class="col-6 col-md-4 col-lg-2-4">
         <div class="phase-card" style="border-top-color:${PALETTE[i % PALETTE.length]}">
           <div class="phase-title">${escapeHtml(p.phase)}</div>
+          <div class="phase-residents">${p.residentCount} resident${p.residentCount === 1 ? '' : 's'}</div>
           <div class="phase-amount">${formatCurrency(p.collected)}</div>
           <div class="phase-pending">Pending ${formatCurrency(p.pending)}</div>
           <div class="progress phase-progress">

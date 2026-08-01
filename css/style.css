@@ -105,6 +105,7 @@ body {
   height: 100%;
 }
 .phase-title { font-weight: 700; font-size: .9rem; color: #374151; }
+.phase-residents { font-size: .72rem; color: #6b7280; margin-bottom: 2px; }
 .phase-amount { font-size: 1.25rem; font-weight: 800; color: var(--green); }
 .phase-pending { font-size: .78rem; color: var(--red); margin-bottom: 6px; }
 .phase-progress { height: 6px; border-radius: 4px; }
