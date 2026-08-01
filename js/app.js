@@ -305,16 +305,73 @@ document.addEventListener("click", async (e) => {
         return Object.assign({ paidCount, notPaidCount }, p);
       });
 
+      const paidRows = paymentRows.filter((r) => r.status === "Paid");
+      const expenseRows = expenseData.rows || [];
+
       box.innerHTML = `
         <div class="row g-3" id="reportPrintable">
-          <div class="col-12"><h5 class="mb-0">Report for ${escapeHtml(month)} ${escapeHtml(String(year))}</h5></div>
-          <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Total Collected</div><div class="stat-value text-success">${formatCurrency(data.collectionThisMonth)}</div></div></div>
-          <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Pending</div><div class="stat-value text-danger">${formatCurrency(data.pendingAmount)}</div></div></div>
-          <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Expenses</div><div class="stat-value text-warning">${formatCurrency(expenseData.total)}</div></div></div>
-          <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Net Balance</div><div class="stat-value ${net >= 0 ? 'text-success' : 'text-danger'}">${formatCurrency(net)}</div></div></div>
 
+          <!-- Header / letterhead -->
+          <div class="col-12 text-center border-bottom pb-3">
+            <h4 class="mb-1">${escapeHtml(CONFIG.ASSOCIATION_NAME)}</h4>
+            <div class="text-muted small">Monthly Financial Report</div>
+          </div>
+
+          <!-- Summary -->
           <div class="col-12">
-            <h6 class="mt-2 mb-2">Phase-wise Breakdown</h6>
+            <h5 class="mb-0">Summary for ${escapeHtml(month)} ${escapeHtml(String(year))}</h5>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2-4"><div class="stat-box"><div class="stat-label">Total Collected</div><div class="stat-value text-success">${formatCurrency(data.collectionThisMonth)}</div></div></div>
+          <div class="col-6 col-md-4 col-lg-2-4"><div class="stat-box"><div class="stat-label">Pending</div><div class="stat-value text-danger">${formatCurrency(data.pendingAmount)}</div></div></div>
+          <div class="col-6 col-md-4 col-lg-2-4"><div class="stat-box"><div class="stat-label">Expenses</div><div class="stat-value text-warning">${formatCurrency(expenseData.total)}</div></div></div>
+          <div class="col-6 col-md-4 col-lg-2-4"><div class="stat-box"><div class="stat-label">Net Balance</div><div class="stat-value ${net >= 0 ? 'text-success' : 'text-danger'}">${formatCurrency(net)}</div></div></div>
+          <div class="col-6 col-md-4 col-lg-2-4"><div class="stat-box"><div class="stat-label">Bank Balance</div><div class="stat-value text-primary">${formatCurrency(data.bankBalance)}</div></div></div>
+
+          <!-- Details -->
+          <div class="col-12 mt-2">
+            <h5 class="mb-2">Details</h5>
+          </div>
+          <div class="col-12 col-lg-6">
+            <h6 class="small text-muted text-uppercase">Payments Received</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-hover align-middle mb-0">
+                <thead><tr><th>House</th><th>Owner</th><th>Amount</th><th>Date Paid</th><th>Mode</th></tr></thead>
+                <tbody>
+                  ${paidRows.length ? paidRows.map((r) => `
+                    <tr>
+                      <td>${escapeHtml(r.houseNumber)}</td>
+                      <td>${escapeHtml(r.owner)}</td>
+                      <td class="text-success">${formatCurrency(r.amount)}</td>
+                      <td>${escapeHtml(r.paidDate || "-")}</td>
+                      <td>${escapeHtml(r.paymentMode || "-")}</td>
+                    </tr>
+                  `).join("") : '<tr><td colspan="5" class="text-center text-muted py-3">No payments recorded.</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6">
+            <h6 class="small text-muted text-uppercase">Expenses</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-hover align-middle mb-0">
+                <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr></thead>
+                <tbody>
+                  ${expenseRows.length ? expenseRows.map((r) => `
+                    <tr>
+                      <td>${escapeHtml(r.date)}</td>
+                      <td>${escapeHtml(r.category)}</td>
+                      <td>${escapeHtml(r.description)}</td>
+                      <td class="text-danger">${formatCurrency(r.amount)}</td>
+                    </tr>
+                  `).join("") : '<tr><td colspan="4" class="text-center text-muted py-3">No expenses recorded.</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Phase-wise split -->
+          <div class="col-12 mt-2">
+            <h5 class="mb-2">Phase-wise Split</h5>
             <div class="table-responsive">
               <table class="table table-sm table-hover align-middle mb-0">
                 <thead>
@@ -337,6 +394,19 @@ document.addEventListener("click", async (e) => {
                   `).join("")}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- Association Committee -->
+          <div class="col-12 mt-3 pt-3 border-top">
+            <h6 class="text-muted text-uppercase small mb-3">Association Committee</h6>
+            <div class="row g-3">
+              ${CONFIG.COMMITTEE.map((c) => `
+                <div class="col-6 col-md-4">
+                  <div class="small text-muted">${escapeHtml(c.role)}</div>
+                  <div class="fw-semibold">${escapeHtml(c.name)}</div>
+                </div>
+              `).join("")}
             </div>
           </div>
         </div>

@@ -20,6 +20,13 @@ const CONFIG = {
   // Shown in the WhatsApp payment reminder message (Admin → Payments → Reminder)
   SITE_URL: "https://xygridsstudio-eng.github.io/mbarwa/",
 
+  // Shown at the bottom of the Monthly Report — update names as the committee changes.
+  COMMITTEE: [
+    { role: "President", name: "ABC" },
+    { role: "Secretary", name: "DEF" },
+    { role: "Treasurer", name: "XYZ" }
+  ],
+
   PROPERTY_TYPES: ["Owner-Occupied", "Rented Out", "Vacant"],
 
   MONTHS: [
