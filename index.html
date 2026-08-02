@@ -335,6 +335,34 @@
       </div>
     </div>
     <div class="card-surface p-3 d-none" id="reportResult"></div>
+
+    <h2 class="h5 mt-4 mb-3">Resident Details Report</h2>
+    <div class="filter-bar mb-3">
+      <div class="row g-2 align-items-end">
+        <div class="col-6 col-md-3">
+          <label class="form-label small">Phase</label>
+          <select id="residentReportPhase" class="form-select form-select-sm">
+            <option value="">All Phases</option>
+            <option>Phase 1</option><option>Phase 2</option><option>Phase 3</option><option>Phase 4</option><option>Phase 5</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label small">Status</label>
+          <select id="residentReportStatus" class="form-select form-select-sm">
+            <option value="">All Status</option>
+            <option>Active</option><option>Pending</option><option>Inactive</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <button class="btn btn-primary btn-sm w-100" id="generateResidentReportBtn"><i class="bi bi-people me-1"></i>Generate Report</button>
+        </div>
+        <div class="col-12 col-md-3 d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm flex-fill" id="downloadResidentReportCsv"><i class="bi bi-filetype-csv"></i> CSV</button>
+          <button class="btn btn-outline-secondary btn-sm flex-fill" id="downloadResidentReportPdf"><i class="bi bi-filetype-pdf"></i> PDF</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-surface p-3 d-none" id="residentReportResult"></div>
   </section>
 
   <!-- ===================== EXPENSES VIEW ===================== -->

@@ -435,6 +435,86 @@ document.addEventListener("click", async (e) => {
     if (!State.lastReport) { showToast("Generate a report first.", "warning"); return; }
     exportToPdf("reportPrintable", "Monthly Report");
   }
+
+  // ---- Resident details report ----
+  // Deliberately limited to the roster fields already shown publicly on Payment
+  // Status (house, owner, phone, phase, status). Property details (email,
+  // emergency contact, etc.) stay admin-only, since this view isn't login-gated.
+  if (e.target && e.target.id === "generateResidentReportBtn") {
+    const box = document.getElementById("residentReportResult");
+    const phase = document.getElementById("residentReportPhase").value;
+    const status = document.getElementById("residentReportStatus").value;
+    renderLoading(box);
+    box.classList.remove("d-none");
+    try {
+      const all = await Api.getResidents();
+      const rows = all.filter((r) => (!phase || r.phase === phase) && (!status || r.status === status));
+
+      const byPhase = CONFIG.PHASES.map((p) => ({ phase: p, count: rows.filter((r) => r.phase === p).length }))
+        .filter((p) => p.count > 0);
+      const scopeLabel = [phase || "All Phases", status || "All Status"].join(" · ");
+
+      box.innerHTML = `
+        <div id="residentReportPrintable">
+          <div class="text-center border-bottom pb-3 mb-3">
+            <h4 class="mb-1">${escapeHtml(CONFIG.ASSOCIATION_NAME)}</h4>
+            <div class="text-muted small">Resident Details Report</div>
+          </div>
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+            <span class="small text-muted">${escapeHtml(scopeLabel)}</span>
+            <span class="small text-muted">${rows.length} resident${rows.length === 1 ? "" : "s"}${byPhase.length ? " — " + byPhase.map((p) => escapeHtml(p.phase) + ": " + p.count).join(", ") : ""}</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+              <thead><tr><th>#</th><th>House</th><th>Owner</th><th>Phone</th><th>Phase</th><th>Status</th></tr></thead>
+              <tbody>
+                ${rows.length ? rows.map((r, i) => `
+                  <tr>
+                    <td>${i + 1}</td>
+                    <td>${escapeHtml(r.houseNumber)}</td>
+                    <td>${escapeHtml(r.ownerName)}</td>
+                    <td>${escapeHtml(String(r.phoneNumber || "-"))}</td>
+                    <td>${escapeHtml(r.phase)}</td>
+                    <td><span class="badge ${r.status === 'Active' ? 'text-bg-success' : r.status === 'Pending' ? 'text-bg-warning' : 'text-bg-secondary'}">${escapeHtml(r.status)}</span></td>
+                  </tr>
+                `).join("") : '<tr><td colspan="6" class="text-center text-muted py-3">No residents match this filter.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-3 pt-3 border-top">
+            <h6 class="text-muted text-uppercase small mb-3">Association Committee</h6>
+            <div class="row g-3">
+              ${CONFIG.COMMITTEE.map((c) => `
+                <div class="col-6 col-md-4">
+                  <div class="small text-muted">${escapeHtml(c.role)}</div>
+                  <div class="fw-semibold">${escapeHtml(c.name)}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+      State.lastResidentReport = { rows, phase, status };
+    } catch (err) {
+      renderEmpty(box, err.message);
+      showError(err);
+    }
+  }
+
+  if (e.target && e.target.id === "downloadResidentReportCsv") {
+    if (!State.lastResidentReport) { showToast("Generate the resident report first.", "warning"); return; }
+    exportToCsv("resident-details.csv", State.lastResidentReport.rows.map((r) => ({
+      HouseNumber: r.houseNumber,
+      OwnerName: r.ownerName,
+      PhoneNumber: r.phoneNumber,
+      Phase: r.phase,
+      Status: r.status
+    })));
+  }
+  if (e.target && e.target.id === "downloadResidentReportPdf") {
+    if (!State.lastResidentReport) { showToast("Generate the resident report first.", "warning"); return; }
+    exportToPdf("residentReportPrintable", "Resident Details Report");
+  }
 });
 
 // ---------------------------------------------------------
