@@ -230,6 +230,7 @@ function wireAdminUi() {
     const form = e.target;
     const payload = {
       residentId: form.residentId.value,
+      propertyCategory: form.propertyCategory.value,
       propertyType: form.propertyType.value,
       familyMembers: form.familyMembers.value,
       vehicles: form.vehicles.value,
@@ -329,6 +330,9 @@ function populateAdminPropertyTypeOptions() {
   if (!sel || sel.options.length) return; // populate once
   sel.innerHTML = '<option value="">Select...</option>' +
     CONFIG.PROPERTY_TYPES.map((t) => `<option value="${t}">${t}</option>`).join("");
+  const catSel = document.querySelector('#adminPropertyForm select[name="propertyCategory"]');
+  catSel.innerHTML = '<option value="">Select...</option>' +
+    CONFIG.PROPERTY_CATEGORIES.map((c) => `<option value="${c}">${c}</option>`).join("");
 }
 
 async function openAdminPropertyModal(residentId) {
@@ -343,6 +347,7 @@ async function openAdminPropertyModal(residentId) {
     const record = await Api.getResidentProperty(residentId);
     document.getElementById("adminPropertySummary").innerHTML =
       `<strong>${escapeHtml(record.ownerName)}</strong> — House ${escapeHtml(record.houseNumber)}, ${escapeHtml(record.phase)}`;
+    form.propertyCategory.value = record.propertyCategory || "";
     form.propertyType.value = record.propertyType || "";
     form.familyMembers.value = record.familyMembers || "";
     form.vehicles.value = record.vehicles || "";

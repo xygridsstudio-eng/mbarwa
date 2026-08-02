@@ -27,6 +27,7 @@ const CONFIG = {
     { role: "Treasurer", name: "XYZ" }
   ],
 
+  PROPERTY_CATEGORIES: ["House", "Open Plot"],
   PROPERTY_TYPES: ["Owner-Occupied", "Rented Out", "Vacant"],
 
   MONTHS: [

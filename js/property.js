@@ -25,6 +25,9 @@ const PropertyView = (function () {
     const sel = document.querySelector('#propertyDetailsForm select[name="propertyType"]');
     sel.innerHTML = '<option value="">Select...</option>' +
       CONFIG.PROPERTY_TYPES.map((t) => `<option value="${t}">${t}</option>`).join("");
+    const catSel = document.querySelector('#propertyDetailsForm select[name="propertyCategory"]');
+    catSel.innerHTML = '<option value="">Select...</option>' +
+      CONFIG.PROPERTY_CATEGORIES.map((c) => `<option value="${c}">${c}</option>`).join("");
   }
 
   function reset() {
@@ -62,6 +65,7 @@ const PropertyView = (function () {
       `<strong>${escapeHtml(record.ownerName)}</strong> — House ${escapeHtml(record.houseNumber)}, ${escapeHtml(record.phase)}`;
 
     const form = document.getElementById("propertyDetailsForm");
+    form.propertyCategory.value = record.propertyCategory || "";
     form.propertyType.value = record.propertyType || "";
     form.familyMembers.value = record.familyMembers || "";
     form.vehicles.value = record.vehicles || "";
@@ -98,6 +102,7 @@ const PropertyView = (function () {
       residentId: current.residentId,
       houseNumber: current.houseNumber,
       phone: current.phone,
+      propertyCategory: form.propertyCategory.value,
       propertyType: form.propertyType.value,
       familyMembers: form.familyMembers.value,
       vehicles: form.vehicles.value,
