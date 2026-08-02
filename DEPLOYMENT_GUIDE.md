@@ -48,16 +48,20 @@ apps-script/SheetSetup.gs
    **setAdminPassword**. First edit the `NEW_PASSWORD` value inside that
    function to your real admin password, then click **Run**. This stores
    the password securely in Script Properties (never in the sheet itself).
-2. Click **Deploy → New deployment**.
-3. Click the gear icon next to "Select type" and choose **Web app**.
-4. Fill in:
+2. Now choose **setViewerPassword** from the same dropdown, edit its
+   `NEW_PASSWORD` value, and click **Run**. This is the **read-only**
+   password you share with all residents so they can view the dashboard
+   and payment status. See "The two passwords" below for what each unlocks.
+3. Click **Deploy → New deployment**.
+4. Click the gear icon next to "Select type" and choose **Web app**.
+5. Fill in:
    - Description: `MBRWA API v1`
    - Execute as: **Me**
    - Who has access: **Anyone**
-5. Click **Deploy**, then **Authorize access** again if prompted.
-6. Copy the **Web app URL** shown — it looks like:
+6. Click **Deploy**, then **Authorize access** again if prompted.
+7. Copy the **Web app URL** shown — it looks like:
    `https://script.google.com/macros/s/AKfycb.../exec`
-7. Keep this tab open; you'll need the URL in Step 3.
+8. Keep this tab open; you'll need the URL in Step 3.
 
    **Updating the script later:** whenever you edit `Code.gs`, go to
    **Deploy → Manage deployments**, click the pencil icon on your existing
@@ -92,16 +96,37 @@ apps-script/SheetSetup.gs
 7. Open that URL — you should see the dashboard load live data from your
    Google Sheet.
 
-## Step 5 — Share the read-only dashboard with residents
+## Step 5 — Share the dashboard with residents
 
-- Share the GitHub Pages URL directly in your residents' WhatsApp group —
-  no login is required for the public dashboard, payment status, and
-  reports views. It works on any phone browser.
+- Share the GitHub Pages URL **and the viewer password** in your residents'
+  WhatsApp group. It works on any phone browser.
 - Residents can **view only**: Home Dashboard, Phase Summary, Payment
-  Status, Monthly Report, Expenses, and Bank Balance. There are no edit
-  controls visible unless someone signs in as Admin.
-- Consider pinning the link in the WhatsApp group description so it's
-  always easy to find.
+  Status, Expenses, and Bank Balance. There are no edit controls visible
+  unless someone signs in as Admin.
+- Consider pinning the link and password in the WhatsApp group description
+  so they're always easy to find.
+
+### The two passwords
+
+| | Viewer password | Admin password |
+|---|---|---|
+| Set with | `setViewerPassword` | `setAdminPassword` |
+| Share with | All residents | Committee members only |
+| Can view dashboard, payment status, expenses, bank balance | Yes | Yes |
+| Can generate/download reports | No | Yes |
+| Can add, edit or delete anything | **No** | Yes |
+
+The admin password works everywhere the viewer password does, so committee
+members only ever need to remember one. Both are checked on the server, so
+the data cannot be read by skipping the screen.
+
+**What stays open without any password:** the **Register** and **My
+Property** pages. New residents have no password yet, and My Property
+already proves identity by matching house number + phone against the
+Residents sheet.
+
+To change either password later, edit and re-run the matching function in
+the Apps Script editor — no redeployment needed.
 
 ## Step 6 — Admin configuration (committee members only)
 
@@ -184,9 +209,9 @@ anytime to edit or delete it — no login required. This lives in the
    delete, even though there's no login — so one resident can't edit
    another's entry just by guessing a link.
 6. **Privacy note:** these details (email, emergency contact, etc.) are
-   never exposed on the public dashboard or Payment Status page — only
-   to the resident themselves (via the phone match) or to a signed-in
-   Admin.
+   never exposed on the dashboard or Payment Status page — not even to
+   someone holding the viewer password. They are visible only to the
+   resident themselves (via the phone match) or to a signed-in Admin.
 
 **If your Residents sheet already existed before this feature:** open the
 Apps Script editor, select **addPropertyColumns** from the function
@@ -211,6 +236,13 @@ form themselves.
 - **Admin login says "Incorrect admin password"** — re-run
   `setAdminPassword` in the Apps Script editor with the password you're
   typing on the site.
+- **"Passwords are not configured on the server yet"** — you skipped
+  Step 2; run `setViewerPassword` (and `setAdminPassword`) once in the
+  Apps Script editor.
+- **Residents see "Password required" and the viewer password is
+  rejected** — re-run `setViewerPassword` with the password you actually
+  shared, and make sure you deployed a **new version** after updating
+  `Code.gs`.
 - **Changes in Google Sheets don't show up** — the dashboard reads data
   live on every page load/filter change, so a browser refresh is enough;
   no caching layer is used.

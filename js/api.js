@@ -59,12 +59,18 @@ const Api = (function () {
     return json.data;
   }
 
-  // ---------- Public (read-only) endpoints ----------
-  const getResidents = () => request("getResidents", {});
-  const getPayments = (month, year) => request("getPayments", { month, year });
-  const getExpenses = (month, year) => request("getExpenses", { month, year });
-  const getDashboard = (month, year) => request("getDashboard", { month, year });
-  const getBankBalance = () => request("getBankBalance", {});
+  // ---------- Read-only endpoints — require the viewer OR admin password ----------
+  // Send whichever credential this session holds; the server accepts either.
+  function withView(params) {
+    const pwd = AdminAuth.isLoggedIn() ? AdminAuth.getPassword() : ViewerAuth.getPassword();
+    return Object.assign({}, params, { viewerPassword: pwd });
+  }
+
+  const getResidents = () => request("getResidents", withView({}));
+  const getPayments = (month, year) => request("getPayments", withView({ month, year }));
+  const getExpenses = (month, year) => request("getExpenses", withView({ month, year }));
+  const getDashboard = (month, year) => request("getDashboard", withView({ month, year }));
+  const getBankBalance = () => request("getBankBalance", withView({}));
 
   // ---------- Admin (write) endpoints — require adminPassword ----------
   function withAuth(params) {
@@ -73,6 +79,7 @@ const Api = (function () {
   }
 
   const login = (password) => request("login", { adminPassword: password });
+  const viewerLogin = (password) => request("viewerLogin", { viewerPassword: password });
 
   const addPayment = (payment) => request("addPayment", withAuth(payment));
   const updatePayment = (payment) => request("updatePayment", withAuth(payment));
@@ -103,7 +110,7 @@ const Api = (function () {
 
   return {
     getResidents, getPayments, getExpenses, getDashboard, getBankBalance,
-    login, addPayment, updatePayment, deletePayment,
+    login, viewerLogin, addPayment, updatePayment, deletePayment,
     addExpense, updateExpense, deleteExpense,
     addResident, updateResident, deleteResident, updateBankBalance,
     registerResident,

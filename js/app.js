@@ -18,6 +18,7 @@ const State = {
 document.addEventListener("DOMContentLoaded", () => {
   buildYearOptions();
   wireNav();
+  wireViewerAuth();
   wireAdminUi();
   document.getElementById("appName").textContent = CONFIG.ASSOCIATION_NAME;
   document.getElementById("footerAppName").textContent = CONFIG.ASSOCIATION_NAME;
@@ -67,13 +68,30 @@ function highlightSidebarGroup(view) {
   }
 }
 
+// Views holding association data — these need at least the read-only viewer
+// password. Register and My Property are deliberately excluded: a new resident
+// has no password yet, and My Property verifies identity by house number + phone.
+// "admin" is excluded too because it has its own login gate built in.
+const VIEW_ACCESS_GATED_VIEWS = ["dashboard", "payments", "reports", "expenses", "bank"];
+let pendingGatedView = null;
+
 function navigateTo(view) {
   document.querySelectorAll(".app-view").forEach((v) => v.classList.add("d-none"));
   document.querySelectorAll("[data-view]").forEach((v) => v.classList.remove("active"));
-  const target = document.getElementById("view-" + view);
-  if (target) target.classList.remove("d-none");
   document.querySelectorAll('[data-view="' + view + '"]').forEach((v) => v.classList.add("active"));
   highlightSidebarGroup(view);
+
+  // Locked: show the lock screen instead of the real view, and never fire the
+  // data request — the backend would reject it anyway.
+  if (VIEW_ACCESS_GATED_VIEWS.indexOf(view) !== -1 && !hasViewAccess()) {
+    pendingGatedView = view;
+    document.getElementById("view-locked").classList.remove("d-none");
+    promptViewerPassword();
+    return;
+  }
+
+  const target = document.getElementById("view-" + view);
+  if (target) target.classList.remove("d-none");
 
   if (view === "dashboard") renderDashboard();
   if (view === "payments") renderPaymentStatus();
@@ -81,6 +99,34 @@ function navigateTo(view) {
   if (view === "expenses") renderExpenses();
   if (view === "bank") renderBankBalance();
   if (view === "admin") renderAdmin();
+}
+
+function promptViewerPassword() {
+  document.getElementById("viewerAuthPassword").value = "";
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("viewerAuthModal")).show();
+}
+
+function wireViewerAuth() {
+  document.getElementById("lockedEnterPasswordBtn").addEventListener("click", promptViewerPassword);
+
+  document.getElementById("viewerAuthForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const password = document.getElementById("viewerAuthPassword").value;
+    const btn = document.getElementById("viewerAuthSubmitBtn");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Checking...';
+    try {
+      await ViewerAuth.login(password);
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("viewerAuthModal")).hide();
+      navigateTo(pendingGatedView || "dashboard");
+      pendingGatedView = null;
+    } catch (err) {
+      showError(new Error("Incorrect password."));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Continue";
+    }
+  });
 }
 
 function buildYearOptions() {

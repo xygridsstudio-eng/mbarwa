@@ -41,6 +41,8 @@ const CONFIG = {
 
   // Where the admin session flag lives in the browser
   ADMIN_SESSION_KEY: "mbrwa_admin_session",
+  // Read-only viewer session (the password shared with all residents)
+  VIEWER_SESSION_KEY: "mbrwa_viewer_session",
 
   // Currency formatting
   CURRENCY_LOCALE: "en-IN",
