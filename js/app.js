@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   buildYearOptions();
   wireNav();
   wireViewerAuth();
+  wireMyPayments();
   wireAdminUi();
   document.getElementById("appName").textContent = CONFIG.ASSOCIATION_NAME;
   document.getElementById("footerAppName").textContent = CONFIG.ASSOCIATION_NAME;
@@ -80,6 +81,9 @@ function navigateTo(view) {
   document.querySelectorAll("[data-view]").forEach((v) => v.classList.remove("active"));
   document.querySelectorAll('[data-view="' + view + '"]').forEach((v) => v.classList.add("active"));
   highlightSidebarGroup(view);
+
+  // The sidebar search looks up households, so it's for committee members only.
+  document.getElementById("globalSearchForm").classList.toggle("d-none", !AdminAuth.isLoggedIn());
 
   // Locked: show the lock screen instead of the real view, and never fire the
   // data request — the backend would reject it anyway.
@@ -256,7 +260,15 @@ document.addEventListener("change", (e) => {
 // ---------------------------------------------------------
 // PAYMENT STATUS
 // ---------------------------------------------------------
+// Admins get the month-by-month view of every household; residents holding only the
+// shared viewer password get their own year's history, unlocked by a house number +
+// phone match (the backend enforces this too — getPayments is admin-only).
 async function renderPaymentStatus() {
+  const isAdmin = AdminAuth.isLoggedIn();
+  document.getElementById("psAdminPane").classList.toggle("d-none", !isAdmin);
+  document.getElementById("psResidentPane").classList.toggle("d-none", isAdmin);
+  if (!isAdmin) return;
+
   const tbody = document.getElementById("paymentStatusBody");
   tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>';
   try {
@@ -270,6 +282,64 @@ async function renderPaymentStatus() {
     renderEmpty(document.getElementById("paymentStatusEmpty"), err.message);
     showError(err);
   }
+}
+
+// ---- Resident's own payment history ----
+function resetMyPayments() {
+  document.getElementById("myPaymentsForm").reset();
+  document.getElementById("myPaymentsStep1").classList.remove("d-none");
+  document.getElementById("myPaymentsResult").classList.add("d-none");
+}
+
+function wireMyPayments() {
+  document.getElementById("myPaymentsSearchAgain").addEventListener("click", resetMyPayments);
+
+  document.getElementById("myPaymentsForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const houseNumber = document.getElementById("myPayHouseNumber").value.trim();
+    const phone = document.getElementById("myPayPhone").value.trim();
+    const year = document.getElementById("myPayYear").value;
+    const btn = document.getElementById("myPaymentsBtn");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Checking...';
+    try {
+      const data = await Api.getMyPayments(houseNumber, phone, year);
+      drawMyPayments(data);
+      document.getElementById("myPaymentsStep1").classList.add("d-none");
+      document.getElementById("myPaymentsResult").classList.remove("d-none");
+    } catch (err) {
+      showError(err);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "View My Payments";
+    }
+  });
+}
+
+function drawMyPayments(data) {
+  document.getElementById("myPaymentsSummary").innerHTML =
+    `<strong>${escapeHtml(data.resident.ownerName)}</strong> — House ${escapeHtml(data.resident.houseNumber)}, ${escapeHtml(data.resident.phase)}
+     <div class="text-muted small">Payment history for ${escapeHtml(String(data.year))}</div>`;
+
+  document.getElementById("myPaymentsCards").innerHTML = `
+    <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Months Paid</div><div class="stat-value text-success">${data.monthsPaid}</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Total Paid</div><div class="stat-value text-success">${formatCurrency(data.totalPaid)}</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Months Pending</div><div class="stat-value text-danger">${data.monthsPending}</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-box"><div class="stat-label">Amount Pending</div><div class="stat-value text-danger">${formatCurrency(data.amountPending)}</div></div></div>
+  `;
+
+  document.getElementById("myPaymentsBody").innerHTML = data.months.map((m) => `
+    <tr class="${m.status === "Upcoming" ? "text-muted" : ""}">
+      <td>${escapeHtml(m.month)}</td>
+      <td>${m.status === "Upcoming"
+            ? '<span class="badge text-bg-light border">Upcoming</span>'
+            : statusBadge(m.status)}</td>
+      <td>${m.amount ? formatCurrency(m.amount) : "-"}</td>
+      <td>${escapeHtml(m.paidDate || "-")}</td>
+      <td>${escapeHtml(m.paymentMode || "-")}</td>
+      <td>${escapeHtml(m.referenceNumber || "-")}</td>
+    </tr>
+  `).join("");
 }
 
 function drawPaymentStatusTable() {
@@ -668,6 +738,12 @@ async function renderBankBalance() {
 document.addEventListener("submit", (e) => {
   if (e.target && e.target.id === "globalSearchForm") {
     e.preventDefault();
+    // Searches the household roster, which is admin-only. The box is hidden from
+    // residents, but guard here too so it can't be reached another way.
+    if (!AdminAuth.isLoggedIn()) {
+      showToast("Search is available to committee members only.", "warning");
+      return;
+    }
     const q = document.getElementById("globalSearchInput").value;
     navigateTo("payments");
     closeSidebar();

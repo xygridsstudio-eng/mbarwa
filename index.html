@@ -162,44 +162,93 @@
 
   <!-- ===================== PAYMENT STATUS VIEW ===================== -->
   <section id="view-payments" class="app-view d-none">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-      <h2 class="h5 mb-0">Payment Status</h2>
-      <button class="btn btn-sm btn-outline-primary" id="psExportCsv"><i class="bi bi-download me-1"></i>Export CSV</button>
-    </div>
 
-    <div class="filter-bar mb-3">
-      <div class="row g-2">
-        <div class="col-6 col-md-2"><select id="psMonth" class="form-select form-select-sm month-select"></select></div>
-        <div class="col-6 col-md-2"><select id="psYear" class="form-select form-select-sm year-select"></select></div>
-        <div class="col-6 col-md-2">
-          <select id="psPhaseFilter" class="form-select form-select-sm">
-            <option value="">All Phases</option>
-            <option>Phase 1</option><option>Phase 2</option><option>Phase 3</option><option>Phase 4</option><option>Phase 5</option>
-          </select>
+    <!-- ---- ADMIN PANE: every household, one month at a time ---- -->
+    <div id="psAdminPane" class="d-none">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h2 class="h5 mb-0">Payment Status</h2>
+        <button class="btn btn-sm btn-outline-primary" id="psExportCsv"><i class="bi bi-download me-1"></i>Export CSV</button>
+      </div>
+
+      <div class="filter-bar mb-3">
+        <div class="row g-2">
+          <div class="col-6 col-md-2"><select id="psMonth" class="form-select form-select-sm month-select"></select></div>
+          <div class="col-6 col-md-2"><select id="psYear" class="form-select form-select-sm year-select"></select></div>
+          <div class="col-6 col-md-2">
+            <select id="psPhaseFilter" class="form-select form-select-sm">
+              <option value="">All Phases</option>
+              <option>Phase 1</option><option>Phase 2</option><option>Phase 3</option><option>Phase 4</option><option>Phase 5</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-2">
+            <select id="psStatusFilter" class="form-select form-select-sm">
+              <option value="">All Status</option>
+              <option value="Paid">Paid</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <input type="text" id="psSearch" class="form-control form-control-sm" placeholder="Search by house number or owner name">
+          </div>
         </div>
-        <div class="col-6 col-md-2">
-          <select id="psStatusFilter" class="form-select form-select-sm">
-            <option value="">All Status</option>
-            <option value="Paid">Paid</option>
-            <option value="Pending">Pending</option>
-          </select>
-        </div>
-        <div class="col-12 col-md-4">
-          <input type="text" id="psSearch" class="form-control form-control-sm" placeholder="Search by house number or owner name">
-        </div>
+      </div>
+
+      <div class="table-responsive card-surface">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>House No.</th><th>Owner</th><th>Phase</th><th>Status</th><th>Paid Date</th><th>Amount</th><th>Phone</th>
+            </tr>
+          </thead>
+          <tbody id="paymentStatusBody"></tbody>
+        </table>
+        <div id="paymentStatusEmpty" class="d-none"></div>
       </div>
     </div>
 
-    <div class="table-responsive card-surface">
-      <table class="table table-hover align-middle mb-0">
-        <thead>
-          <tr>
-            <th>House No.</th><th>Owner</th><th>Phase</th><th>Status</th><th>Paid Date</th><th>Amount</th><th>Phone</th>
-          </tr>
-        </thead>
-        <tbody id="paymentStatusBody"></tbody>
-      </table>
-      <div id="paymentStatusEmpty" class="d-none"></div>
+    <!-- ---- RESIDENT PANE: your own payments across a year ---- -->
+    <div id="psResidentPane" class="d-none">
+      <h2 class="h5 mb-1">My Payment Status</h2>
+      <p class="text-muted small mb-3">See every maintenance payment recorded for your household this year. Verify with your house number and the phone number the association has on file.</p>
+
+      <!-- Step 1: verify identity -->
+      <div id="myPaymentsStep1" class="card-surface p-4 mx-auto" style="max-width:420px;">
+        <form id="myPaymentsForm">
+          <div class="mb-3">
+            <label class="form-label small">House Number</label>
+            <input type="text" class="form-control" id="myPayHouseNumber" placeholder="e.g. A12" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">Phone Number</label>
+            <input type="text" class="form-control" id="myPayPhone" placeholder="Phone number on file" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">Year</label>
+            <select class="form-select year-select" id="myPayYear"></select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100" id="myPaymentsBtn">View My Payments</button>
+        </form>
+        <p class="small text-muted mt-3 mb-0">Only your own household's record is shown. If your details don't match, contact the committee to update your phone number.</p>
+      </div>
+
+      <!-- Step 2: results -->
+      <div id="myPaymentsResult" class="d-none">
+        <div class="card-surface p-3 mb-3">
+          <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+            <div id="myPaymentsSummary"></div>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="myPaymentsSearchAgain"><i class="bi bi-arrow-left me-1"></i>Search again</button>
+          </div>
+        </div>
+        <div class="row g-3 mb-3" id="myPaymentsCards"></div>
+        <div class="table-responsive card-surface">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr><th>Month</th><th>Status</th><th>Amount</th><th>Date Paid</th><th>Mode</th><th>Reference</th></tr>
+            </thead>
+            <tbody id="myPaymentsBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </section>
 

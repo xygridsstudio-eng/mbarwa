@@ -100,9 +100,14 @@ apps-script/SheetSetup.gs
 
 - Share the GitHub Pages URL **and the viewer password** in your residents'
   WhatsApp group. It works on any phone browser.
-- Residents can **view only**: Home Dashboard, Phase Summary, Payment
-  Status, Expenses, and Bank Balance. There are no edit controls visible
-  unless someone signs in as Admin.
+- Residents can **view only**: Home Dashboard, Phase Summary, Expenses,
+  Bank Balance, and **their own** payment history. There are no edit
+  controls visible unless someone signs in as Admin.
+- On **Payment Status**, a resident enters their house number and the
+  phone number on file to see every month of the chosen year for their
+  household alone. They never see other households, and the sidebar
+  search is hidden from them. Admins see the usual month-by-month table
+  covering everyone.
 - Consider pinning the link and password in the WhatsApp group description
   so they're always easy to find.
 
@@ -112,7 +117,9 @@ apps-script/SheetSetup.gs
 |---|---|---|
 | Set with | `setViewerPassword` | `setAdminPassword` |
 | Share with | All residents | Committee members only |
-| Can view dashboard, payment status, expenses, bank balance | Yes | Yes |
+| Can view dashboard, expenses, bank balance | Yes | Yes |
+| Can view payment status | Own household only | All households |
+| Can see the household list and phone numbers | **No** | Yes |
 | Can generate/download reports | No | Yes |
 | Can add, edit or delete anything | **No** | Yes |
 

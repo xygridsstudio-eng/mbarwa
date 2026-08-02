@@ -66,8 +66,10 @@ const Api = (function () {
     return Object.assign({}, params, { viewerPassword: pwd });
   }
 
-  const getResidents = () => request("getResidents", withView({}));
-  const getPayments = (month, year) => request("getPayments", withView({ month, year }));
+  // A resident's own payment history for a year, proven by house number + phone.
+  const getMyPayments = (houseNumber, phone, year) =>
+    request("getMyPayments", withView({ houseNumber, phone, year }));
+
   const getExpenses = (month, year) => request("getExpenses", withView({ month, year }));
   const getDashboard = (month, year) => request("getDashboard", withView({ month, year }));
   const getBankBalance = () => request("getBankBalance", withView({}));
@@ -80,6 +82,11 @@ const Api = (function () {
 
   const login = (password) => request("login", { adminPassword: password });
   const viewerLogin = (password) => request("viewerLogin", { viewerPassword: password });
+
+  // Both expose the full household roster including phone numbers, so they are
+  // admin-only. Residents use getMyPayments for their own record instead.
+  const getResidents = () => request("getResidents", withAuth({}));
+  const getPayments = (month, year) => request("getPayments", withAuth({ month, year }));
 
   const addPayment = (payment) => request("addPayment", withAuth(payment));
   const updatePayment = (payment) => request("updatePayment", withAuth(payment));
@@ -109,7 +116,7 @@ const Api = (function () {
   const deleteResidentProperty = (residentId) => request("deleteResidentProperty", withAuth({ residentId }));
 
   return {
-    getResidents, getPayments, getExpenses, getDashboard, getBankBalance,
+    getResidents, getPayments, getMyPayments, getExpenses, getDashboard, getBankBalance,
     login, viewerLogin, addPayment, updatePayment, deletePayment,
     addExpense, updateExpense, deleteExpense,
     addResident, updateResident, deleteResident, updateBankBalance,
