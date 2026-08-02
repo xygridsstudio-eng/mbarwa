@@ -764,6 +764,28 @@
   </div>
 </div>
 
+<!-- Report Password Modal -->
+<div class="modal fade" id="reportAuthModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <form id="reportAuthForm">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-shield-lock me-1"></i>Admin Password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted">Reports are for committee members. Enter the admin password to continue.</p>
+          <input type="password" class="form-control" id="reportAuthPassword" required autocomplete="current-password" placeholder="Admin password">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="reportAuthSubmitBtn">Continue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Reminder Modal -->
 <div class="modal fade" id="reminderModal" tabindex="-1">
   <div class="modal-dialog modal-lg">

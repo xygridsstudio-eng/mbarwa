@@ -283,6 +283,54 @@ async function renderReports() {
   box.classList.add("d-none");
 }
 
+// Report generation and downloads are committee-only. These buttons are
+// intercepted in the capture phase below: if there's no admin session, the
+// click is cancelled and the password modal is shown instead. After a
+// successful sign-in the original button is clicked again, which then passes
+// the gate and runs the real handler.
+//
+// Note this gates the reports themselves, not the underlying data — the
+// dashboard, payment status and expenses pages are public by design, so the
+// same figures remain visible there without a password.
+const GATED_REPORT_BUTTONS = [
+  "generateReportBtn", "downloadReportCsv", "downloadReportPdf",
+  "generateResidentReportBtn", "downloadResidentReportCsv", "downloadResidentReportPdf"
+];
+let pendingReportButtonId = null;
+
+document.addEventListener("click", (e) => {
+  const btn = e.target && e.target.closest ? e.target.closest("button") : null;
+  if (!btn || GATED_REPORT_BUTTONS.indexOf(btn.id) === -1) return;
+  if (AdminAuth.isLoggedIn()) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  pendingReportButtonId = btn.id;
+  document.getElementById("reportAuthPassword").value = "";
+  new bootstrap.Modal(document.getElementById("reportAuthModal")).show();
+}, true);
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("reportAuthForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const password = document.getElementById("reportAuthPassword").value;
+    const btn = document.getElementById("reportAuthSubmitBtn");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Checking...';
+    try {
+      await AdminAuth.login(password);
+      bootstrap.Modal.getInstance(document.getElementById("reportAuthModal")).hide();
+      const resume = pendingReportButtonId && document.getElementById(pendingReportButtonId);
+      pendingReportButtonId = null;
+      if (resume) resume.click();
+    } catch (err) {
+      showError(new Error("Incorrect password."));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Continue";
+    }
+  });
+});
+
 document.addEventListener("click", async (e) => {
   if (e.target && e.target.id === "generateReportBtn") {
     const month = document.getElementById("reportMonth").value;
